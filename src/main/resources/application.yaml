@@ -1,0 +1,71 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          spotify:
+            client-id: ${SPOTIFY_CLIENT_ID}
+            client-secret: ${SPOTIFY_CLIENT_SECRET}
+            scope:
+              - user-read-email
+              - user-read-private
+              - playlist-read-private
+              - playlist-read-collaborative
+              - user-read-recently-played
+              - playlist-modify-public
+            redirect-uri: "${BASE_URL}/login/oauth2/code/{registrationId}"
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_basic
+        provider:
+          spotify:
+            authorization-uri: https://accounts.spotify.com/authorize?show_dialog=true&prompt=consent
+            token-uri: https://accounts.spotify.com/api/token
+            user-info-uri: https://api.spotify.com/v1/me
+            user-name-attribute: id
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  redis:
+    host: ${SPRING_REDIS_HOST}
+    port: ${SPRING_REDIS_PORT}
+    password: ${SPRING_REDIS_PASSWORD}
+
+  session:
+    redis:
+      cleanup-cron: "0 0 2 * * *"  # Cleanup sessions daily at 2 AM
+
+server:
+#  port: ${SERVER_PORT:8080}  # default 8080
+  port: ${PORT:8080}  # Railway injects PORT automatically
+  use-forward-headers: true
+  forward-headers-strategy: framework
+
+
+encryption:
+  password: ${ENCRYPTION_PASSWORD}
+  salt: ${ENCRYPTION_SALT}
+
+springdoc:
+  swagger-ui:
+    csrf:
+      enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.example.musicGenie.auth: DEBUG
+    com.example.musicGenie.services.userProvider: DEBUG
+    org.springframework: INFO
+    org.springframework.security: DEBUG
+    0rg.springframework.security.oauth2: TRACE
+    org.springframework.web.client.RestTemplate: DEBUG
+    org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient: TRACE
