@@ -1,0 +1,41 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17 (with maven cache)
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Cache local Maven repo
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2-
+
+      - name: Build & run tests
+        run: mvn -B -DskipTests=false package --file pom.xml
+
+      - name: Deploy to Railway (only on main)
+        if: github.ref == 'refs/heads/main'
+        uses: bervProject/railway-deploy@main
+        env:
+          # Railway expects a token in env (RAILWAY_TOKEN)
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        with:
+          # service id (recommended to store as a repo secret)
+          service: ${{ secrets.RAILWAY_SERVICE }}
