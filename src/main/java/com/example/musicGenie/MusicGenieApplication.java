@@ -15,7 +15,7 @@ public class MusicGenieApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MusicGenieApplication.class, args);
-		System.out.println("Server running on port: " + System.getenv("PORT"));
+		System.out.println("Server is running on port: " + System.getenv("PORT"));
 	}
 
 }
