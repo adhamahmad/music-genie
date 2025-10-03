@@ -13,4 +13,4 @@ spring:
 
 encryption:
   password: dummy-password
-  salt: dummy-salt
+  salt: 0123456789abcdef
