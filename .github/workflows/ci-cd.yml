@@ -35,8 +35,7 @@ jobs:
         uses: bervProject/railway-deploy@main
         env:
           # Railway expects a token in env (RAILWAY_TOKEN)
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
         with:
           # service id (recommended to store as a repo secret)
-          railway_token: ${{ secrets.RAILWAY_PROJECT_TOKEN }}  # Project token
           service: ${{ secrets.RAILWAY_SERVICE }}
