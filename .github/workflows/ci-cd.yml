@@ -32,10 +32,7 @@ jobs:
 
       - name: Deploy to Railway (only on main)
         if: github.ref == 'refs/heads/main'
-        uses: bervProject/railway-deploy@main
-        env:
-          # Railway expects a token in env (RAILWAY_TOKEN)
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+        uses: railwayapp/railway-deploy@v1
         with:
-          # service id (recommended to store as a repo secret)
-          service: ${{ secrets.RAILWAY_SERVICE }}
+             railway_token: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+             service: ${{ secrets.RAILWAY_SERVICE }}
