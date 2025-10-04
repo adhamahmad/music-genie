@@ -7,6 +7,11 @@ import com.example.musicGenie.dtos.song.SongDto;
 import com.example.musicGenie.services.playlist.PlaylistService;
 import com.example.musicGenie.services.session.SessionService;
 import com.example.musicGenie.services.song.SongService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,7 +30,26 @@ public class SongController {
     private final SessionService sessionService;
 
     @GetMapping("/{provider}")
-    public ResponseEntity<List<SongDto>> getPlaylistSongs(@PathVariable String provider, @RequestParam String playlistId, HttpSession session) {
+    @Operation(
+            summary = "Get songs from a playlist",
+            description = """
+                Retrieves all songs for the given playlist ID from the specified music provider.
+                - The `playlistId` must be obtained from the **Get Playlists** API.
+                - Currently, only the `spotify` provider is supported.
+                Requires the user to be authenticated with the music provider.
+                """
+    )
+    public ResponseEntity<List<SongDto>> getPlaylistSongs(
+            @Parameter(
+                    description = "Music provider. Currently only 'spotify' is supported.",
+                    schema = @Schema(allowableValues = {"spotify"})
+            )
+            @PathVariable String provider,
+
+            @Parameter(
+                    description = "The ID of the playlist (must be obtained from the Get Playlists API)."
+            )
+            @RequestParam String playlistId, HttpSession session) {
         String accessToken = sessionService.getAccessToken(session);
         Long userId = sessionService.getUserId(session);
 

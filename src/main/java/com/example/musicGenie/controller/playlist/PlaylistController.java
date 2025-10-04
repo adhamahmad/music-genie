@@ -6,6 +6,11 @@ import com.example.musicGenie.dtos.playlist.CreatePlaylistRequest;
 import com.example.musicGenie.dtos.playlist.PlaylistDto;
 import com.example.musicGenie.services.playlist.PlaylistService;
 import com.example.musicGenie.services.session.SessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +33,22 @@ public class PlaylistController {
     private final SessionService sessionService;
 
     @GetMapping("/{provider}")
-    public ResponseEntity<List<PlaylistDto>> getUserPlaylists(@PathVariable String provider,HttpSession session, @RequestParam(required = false) Boolean forceRefresh) {
+    @Operation(
+            summary = "Get user playlists",
+            description = """
+                Returns all playlists for the current user from the given music provider.
+                Currently supported provider: **spotify**.
+                If `forceRefresh=true`, playlists will be fetched directly from the provider, bypassing the cache.
+                """
+    )
+    public ResponseEntity<List<PlaylistDto>> getUserPlaylists(
+            @Parameter(
+                    description = "Music provider. Currently only 'spotify' is supported.",
+                    schema = @Schema(allowableValues = {"spotify"})
+            )
+            @PathVariable String provider,
+            HttpSession session, @RequestParam(required = false) Boolean forceRefresh
+    ) {
         String accessToken = sessionService.getAccessToken(session);
         Long userId = sessionService.getUserId(session);
         if (accessToken == null) {
@@ -41,7 +61,21 @@ public class PlaylistController {
     }
 
     @PostMapping("/{provider}")
+    @Operation(
+            summary = "Create a new playlist",
+            description = """
+                Creates a new playlist for the authenticated user on the given music provider.
+                
+                - The request must include a **filterId** (obtained from the Filter API) and a **playlist name**.
+                - Currently, only the `spotify` provider is supported.
+                - Requires authentication with the music provider.
+                """
+    )
     public ResponseEntity<PlaylistDto> createPlaylist(
+            @Parameter(
+                    description = "Music provider. Currently only 'spotify' is supported.",
+                    schema = @Schema(allowableValues = {"spotify"})
+            )
             @PathVariable String provider,
             @RequestBody CreatePlaylistRequest request,
             HttpSession session

@@ -9,6 +9,9 @@ import com.example.musicGenie.services.filter.FilterService;
 import com.example.musicGenie.services.playlist.PlaylistCacheService;
 import com.example.musicGenie.services.playlist.PlaylistService;
 import com.example.musicGenie.services.session.SessionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,14 @@ public class filterController {
     private final SessionService sessionService;
 
     @PostMapping
+    @Operation(
+            summary = "Filter songs",
+            description = """
+                Creates a filter request to return playlists or songs matching the provided filters.
+                At least one filter parameter must be provided in the request body.
+                Requires authentication with the music provider.
+                """
+    )
     public ResponseEntity<PlaylistFilterResponse> filterSongs(HttpSession session, @RequestBody @Valid PlaylistFilterRequest request) {
         String accessToken = sessionService.getAccessToken(session);
         Long userId = sessionService.getUserId(session);
